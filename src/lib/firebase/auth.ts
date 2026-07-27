@@ -24,11 +24,18 @@ import { getFirebaseAuth } from './config';
 // ─── Auth State ─────────────────────────────────────────────
 
 export function onAuthChange(callback: (user: FirebaseUser | null) => void): Unsubscribe {
-  return onAuthStateChanged(getFirebaseAuth(), callback);
+  const authInstance = getFirebaseAuth();
+  if (!authInstance) {
+    callback(null);
+    return () => {};
+  }
+  return onAuthStateChanged(authInstance, callback);
 }
 
 export function getCurrentUser(): FirebaseUser | null {
-  return getFirebaseAuth().currentUser;
+  const authInstance = getFirebaseAuth();
+  if (!authInstance) return null;
+  return authInstance.currentUser;
 }
 
 export async function getIdToken(): Promise<string | null> {
@@ -46,19 +53,27 @@ export async function getIdTokenResult() {
 // ─── Email/Password Auth ────────────────────────────────────
 
 export async function createAccount(email: string, password: string) {
-  return createUserWithEmailAndPassword(getFirebaseAuth(), email, password);
+  const authInstance = getFirebaseAuth();
+  if (!authInstance) throw new Error('Firebase Auth is not configured');
+  return createUserWithEmailAndPassword(authInstance, email, password);
 }
 
 export async function signInWithEmail(email: string, password: string) {
-  return signInWithEmailAndPassword(getFirebaseAuth(), email, password);
+  const authInstance = getFirebaseAuth();
+  if (!authInstance) throw new Error('Firebase Auth is not configured');
+  return signInWithEmailAndPassword(authInstance, email, password);
 }
 
 export async function signOutUser() {
-  return signOut(getFirebaseAuth());
+  const authInstance = getFirebaseAuth();
+  if (!authInstance) return;
+  return signOut(authInstance);
 }
 
 export async function resetPassword(email: string) {
-  return sendPasswordResetEmail(getFirebaseAuth(), email);
+  const authInstance = getFirebaseAuth();
+  if (!authInstance) throw new Error('Firebase Auth is not configured');
+  return sendPasswordResetEmail(authInstance, email);
 }
 
 // ─── Profile Update ─────────────────────────────────────────
@@ -83,10 +98,12 @@ export async function updateUserPassword(currentPassword: string, newPassword: s
 // ─── Google Auth ────────────────────────────────────────────
 
 export async function signInWithGoogle() {
+  const authInstance = getFirebaseAuth();
+  if (!authInstance) throw new Error('Firebase Auth is not configured');
   const provider = new GoogleAuthProvider();
   provider.addScope('email');
   provider.addScope('profile');
-  return signInWithPopup(getFirebaseAuth(), provider);
+  return signInWithPopup(authInstance, provider);
 }
 
 // ─── Account Deletion ───────────────────────────────────────
