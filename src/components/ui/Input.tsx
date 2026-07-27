@@ -30,15 +30,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 w-full">
         {label && (
           <label className="text-sm font-medium text-fp-gray">
             {label}
           </label>
         )}
-        <div className="relative">
+        <div className="relative w-full flex items-center">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-fp-gray">
+            <div className="absolute left-3.5 z-10 text-fp-gray pointer-events-none flex items-center justify-center">
               {icon}
             </div>
           )}
@@ -46,14 +46,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             type={inputType}
             className={cn(
-              'w-full bg-fp-surface/50 border rounded-xl px-4 text-fp-white placeholder-fp-gray/50',
+              'w-full bg-fp-surface/60 border rounded-xl text-fp-white placeholder-fp-gray/50',
               'transition-all duration-300',
-              'focus:outline-none focus:border-fp-neon-blue/60 focus:ring-2 focus:ring-fp-neon-blue/20',
-              'focus:shadow-[0_0_20px_rgba(0,212,255,0.1)]',
+              'focus:outline-none focus:border-fp-neon-blue focus:ring-2 focus:ring-fp-neon-blue/20',
               'disabled:opacity-50 disabled:cursor-not-allowed',
-              error ? 'border-fp-neon-pink/60' : 'border-fp-border/50',
-              icon ? 'pl-10' : '',
-              (iconRight || isPassword) ? 'pr-10' : '',
+              error ? 'border-fp-neon-pink' : 'border-fp-border/60',
+              icon ? 'pl-11' : 'pl-4',
+              (iconRight || isPassword) ? 'pr-11' : 'pr-4',
               sizeStyles[inputSize],
               className
             )}
@@ -63,19 +62,19 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-fp-gray hover:text-fp-white transition-colors cursor-pointer"
+              className="absolute right-3.5 z-10 text-fp-gray hover:text-fp-white transition-colors cursor-pointer p-1"
               tabIndex={-1}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           )}
           {!isPassword && iconRight && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-fp-gray">
+            <div className="absolute right-3.5 z-10 text-fp-gray pointer-events-none flex items-center justify-center">
               {iconRight}
             </div>
           )}
         </div>
-        {error && <p className="text-xs text-fp-neon-pink">{error}</p>}
+        {error && <p className="text-xs text-fp-neon-pink font-medium">{error}</p>}
         {!error && helperText && <p className="text-xs text-fp-gray/70">{helperText}</p>}
       </div>
     );
@@ -96,22 +95,22 @@ interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, helperText, className, ...props }, ref) => {
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 w-full">
         {label && (
           <label className="text-sm font-medium text-fp-gray">{label}</label>
         )}
         <textarea
           ref={ref}
           className={cn(
-            'w-full bg-fp-surface/50 border rounded-xl px-4 py-3 text-fp-white placeholder-fp-gray/50',
+            'w-full bg-fp-surface/60 border rounded-xl px-4 py-3 text-fp-white placeholder-fp-gray/50',
             'transition-all duration-300 min-h-[100px] resize-y',
-            'focus:outline-none focus:border-fp-neon-blue/60 focus:ring-2 focus:ring-fp-neon-blue/20',
-            error ? 'border-fp-neon-pink/60' : 'border-fp-border/50',
+            'focus:outline-none focus:border-fp-neon-blue focus:ring-2 focus:ring-fp-neon-blue/20',
+            error ? 'border-fp-neon-pink' : 'border-fp-border/60',
             className
           )}
           {...props}
         />
-        {error && <p className="text-xs text-fp-neon-pink">{error}</p>}
+        {error && <p className="text-xs text-fp-neon-pink font-medium">{error}</p>}
         {!error && helperText && <p className="text-xs text-fp-gray/70">{helperText}</p>}
       </div>
     );

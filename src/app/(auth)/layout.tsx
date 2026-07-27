@@ -1,44 +1,45 @@
 /* ──────────────────────────────────────────────────────────────
    FUTURE PILOT — Auth Layout
-   Centered layout with animated background for auth pages
+   Centered layout with subtle animated glow for auth pages
    ────────────────────────────────────────────────────────────── */
 
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Future Pilot — Sign In',
-  description: 'Access your Future Pilot dashboard',
+  description: 'Access your Future Pilot workspace',
 };
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Gradient Mesh Background */}
-      <div className="absolute inset-0 bg-fp-black">
-        <div className="absolute top-0 -left-1/4 w-1/2 h-1/2 bg-fp-neon-blue/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 -right-1/4 w-1/2 h-1/2 bg-fp-neon-purple/5 rounded-full blur-[120px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/3 h-1/3 bg-fp-neon-cyan/3 rounded-full blur-[100px]" />
+    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 relative bg-fp-black overflow-x-hidden">
+      {/* Background Mesh Glow */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-fp-neon-blue/8 rounded-full blur-[140px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] bg-fp-neon-purple/8 rounded-full blur-[140px]" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-md px-4">
-        {/* Logo */}
-        <a href="/" className="flex items-center justify-center gap-3 mb-8 group">
-          <div className="relative w-12 h-12 flex items-center justify-center">
-            <div className="absolute inset-0 bg-gradient-to-br from-fp-neon-blue to-fp-neon-purple rounded-2xl opacity-80 group-hover:opacity-100 transition-opacity" />
-            <span className="relative text-white font-bold text-xl font-display">FP</span>
+      {/* Main Container */}
+      <div className="relative z-10 w-full max-w-md mx-auto my-auto flex flex-col items-center">
+        {/* Brand Logo Header */}
+        <a href="/" className="inline-flex items-center gap-3 mb-6 group transition-transform hover:scale-105">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-fp-neon-blue to-fp-neon-purple flex items-center justify-center shadow-[0_0_20px_rgba(0,212,255,0.3)]">
+            <span className="text-white font-bold text-lg font-display">FP</span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-fp-white font-display font-bold text-xl tracking-tight">
+          <div className="flex flex-col text-left">
+            <span className="text-fp-white font-display font-bold text-xl tracking-tight leading-tight">
               Future Pilot
             </span>
-            <span className="text-fp-gray text-[10px] font-medium tracking-widest uppercase">
+            <span className="text-fp-neon-cyan text-[10px] font-semibold tracking-widest uppercase">
               Ecosystem
             </span>
           </div>
         </a>
 
-        {children}
+        {/* Form Page Content */}
+        <div className="w-full">
+          {children}
+        </div>
       </div>
     </div>
   );

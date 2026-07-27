@@ -15,27 +15,26 @@ import { registerWithEmail } from '@/services/auth.service';
 import { createStudentProfile } from '@/services/student.service';
 import { UserRole } from '@/types';
 import { validateEmail, validatePassword, getPasswordStrength } from '@/lib/utils/validators';
-import { fadeInUp } from '@/lib/animations/variants';
 
 const ROLES = [
   {
     id: UserRole.STUDENT,
     label: 'Student',
-    icon: <GraduationCap className="w-8 h-8" />,
+    icon: <GraduationCap className="w-6 h-6" />,
     description: 'Apply to projects, earn money, and build your career',
     color: 'from-fp-neon-blue to-fp-neon-cyan',
   },
   {
     id: UserRole.COMPANY,
     label: 'Company',
-    icon: <Building className="w-8 h-8" />,
+    icon: <Building className="w-6 h-6" />,
     description: 'Post projects, find talented students, get work done',
     color: 'from-fp-neon-purple to-fp-neon-pink',
   },
   {
     id: UserRole.COLLEGE,
     label: 'College',
-    icon: <BookOpen className="w-8 h-8" />,
+    icon: <BookOpen className="w-6 h-6" />,
     description: 'Manage students, track placements, build industry connections',
     color: 'from-fp-neon-gold to-fp-neon-pink',
   },
@@ -123,207 +122,215 @@ export default function RegisterPage() {
   };
 
   return (
-    <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="w-full">
-      <div className="bg-fp-dark/60 backdrop-blur-xl border border-fp-border/30 rounded-2xl p-8">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-fp-white font-display mb-2">Create Account</h1>
-          <p className="text-fp-gray text-sm">Join the Future Pilot ecosystem</p>
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="w-full bg-fp-dark/90 backdrop-blur-2xl border border-fp-border/50 rounded-3xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.6)]"
+    >
+      {/* Header */}
+      <div className="text-center mb-6">
+        <h1 className="text-2xl font-bold text-fp-white font-display mb-1">Create Account</h1>
+        <p className="text-fp-gray text-xs sm:text-sm">Join the Future Pilot ecosystem</p>
+      </div>
 
-        {/* Progress */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            {Array.from({ length: totalSteps }).map((_, i) => (
-              <div key={i} className="flex items-center">
+      {/* Progress Bar Steps */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-2">
+          {Array.from({ length: totalSteps }).map((_, i) => (
+            <div key={i} className="flex items-center flex-1 last:flex-none">
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                  i + 1 <= step
+                    ? 'bg-gradient-to-r from-fp-neon-blue to-fp-neon-purple text-white shadow-[0_0_15px_rgba(0,212,255,0.3)]'
+                    : 'bg-fp-surface text-fp-gray border border-fp-border/40'
+                }`}
+              >
+                {i + 1 < step ? <Check className="w-3.5 h-3.5" /> : i + 1}
+              </div>
+              {i < totalSteps - 1 && (
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
-                    i + 1 <= step
-                      ? 'bg-gradient-to-r from-fp-neon-blue to-fp-neon-purple text-white'
-                      : 'bg-fp-surface text-fp-gray'
-                  }`}
-                >
-                  {i + 1 < step ? <Check className="w-4 h-4" /> : i + 1}
-                </div>
-                {i < totalSteps - 1 && (
-                  <div className={`w-full h-0.5 mx-2 transition-all duration-300 ${
+                  className={`flex-1 h-0.5 mx-2 transition-all duration-300 ${
                     i + 1 < step ? 'bg-fp-neon-blue' : 'bg-fp-surface'
-                  }`} style={{ minWidth: '60px' }} />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <AnimatePresence mode="wait">
-          {/* Step 1: Role Selection */}
-          {step === 1 && (
-            <motion.div
-              key="step1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-3"
-            >
-              <p className="text-sm font-medium text-fp-gray mb-4">I am a...</p>
-              {ROLES.map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => setRole(r.id)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 cursor-pointer text-left ${
-                    role === r.id
-                      ? 'border-fp-neon-blue/60 bg-fp-neon-blue/5 shadow-[0_0_20px_rgba(0,212,255,0.1)]'
-                      : 'border-fp-border/30 hover:border-fp-border/60 hover:bg-fp-surface/20'
                   }`}
-                >
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${r.color} text-white`}>
-                    {r.icon}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-fp-white">{r.label}</p>
-                    <p className="text-xs text-fp-gray">{r.description}</p>
-                  </div>
-                  {role === r.id && (
-                    <div className="ml-auto">
-                      <Check className="w-5 h-5 text-fp-neon-blue" />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </motion.div>
-          )}
-
-          {/* Step 2: Account Details */}
-          {step === 2 && (
-            <motion.div
-              key="step2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4"
-            >
-              <Input
-                label="Full Name"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                error={errors.name}
-                icon={<User className="w-4 h-4" />}
-              />
-              <Input
-                label="Email Address"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                error={errors.email}
-                icon={<Mail className="w-4 h-4" />}
-              />
-              <div>
-                <Input
-                  label="Password"
-                  type="password"
-                  placeholder="Create a strong password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  error={errors.password}
-                  icon={<Lock className="w-4 h-4" />}
                 />
-                {password && (
-                  <div className="mt-2">
-                    <ProgressBar
-                      value={passwordStrength.score}
-                      max={4}
-                      size="sm"
-                      color={passwordStrength.score >= 4 ? 'cyan' : passwordStrength.score >= 3 ? 'blue' : passwordStrength.score >= 2 ? 'gold' : 'pink'}
-                    />
-                    <p className="text-xs mt-1" style={{ color: passwordStrength.color }}>
-                      {passwordStrength.label}
-                    </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <AnimatePresence mode="wait">
+        {/* Step 1: Role Selection */}
+        {step === 1 && (
+          <motion.div
+            key="step1"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -15 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-3"
+          >
+            <p className="text-xs font-semibold text-fp-gray uppercase tracking-wider mb-2">I am joining as...</p>
+            {ROLES.map((r) => (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => setRole(r.id)}
+                className={`w-full flex items-center gap-3.5 p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer text-left ${
+                  role === r.id
+                    ? 'border-fp-neon-blue bg-fp-neon-blue/10 shadow-[0_0_20px_rgba(0,212,255,0.15)]'
+                    : 'border-fp-border/40 hover:border-fp-border/80 hover:bg-fp-surface/40'
+                }`}
+              >
+                <div className={`p-2.5 rounded-xl bg-gradient-to-br ${r.color} text-white shrink-0`}>
+                  {r.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm text-fp-white">{r.label}</p>
+                  <p className="text-xs text-fp-gray/80 truncate">{r.description}</p>
+                </div>
+                {role === r.id && (
+                  <div className="shrink-0">
+                    <Check className="w-5 h-5 text-fp-neon-blue" />
                   </div>
                 )}
-              </div>
+              </button>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Step 2: Account Details */}
+        {step === 2 && (
+          <motion.div
+            key="step2"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -15 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-4"
+          >
+            <Input
+              label="Full Name"
+              placeholder="Enter your full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              error={errors.name}
+              icon={<User className="w-4 h-4" />}
+            />
+            <Input
+              label="Email Address"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              error={errors.email}
+              icon={<Mail className="w-4 h-4" />}
+            />
+            <div>
               <Input
-                label="Confirm Password"
+                label="Password"
                 type="password"
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                error={errors.confirmPassword}
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                error={errors.password}
                 icon={<Lock className="w-4 h-4" />}
               />
-            </motion.div>
-          )}
+              {password && (
+                <div className="mt-2">
+                  <ProgressBar
+                    value={passwordStrength.score}
+                    max={4}
+                    size="sm"
+                    color={passwordStrength.score >= 4 ? 'cyan' : passwordStrength.score >= 3 ? 'blue' : passwordStrength.score >= 2 ? 'gold' : 'pink'}
+                  />
+                  <p className="text-xs mt-1 font-medium" style={{ color: passwordStrength.color }}>
+                    {passwordStrength.label}
+                  </p>
+                </div>
+              )}
+            </div>
+            <Input
+              label="Confirm Password"
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={errors.confirmPassword}
+              icon={<Lock className="w-4 h-4" />}
+            />
+          </motion.div>
+        )}
 
-          {/* Step 3: Student Details */}
-          {step === 3 && role === UserRole.STUDENT && (
-            <motion.div
-              key="step3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4"
-            >
-              <Input
-                label="College Name"
-                placeholder="e.g., IET DAVV"
-                value={college}
-                onChange={(e) => setCollege(e.target.value)}
-                icon={<BookOpen className="w-4 h-4" />}
-              />
-              <Input
-                label="Branch / Department"
-                placeholder="e.g., Computer Science"
-                value={branch}
-                onChange={(e) => setBranch(e.target.value)}
-              />
-              <Input
-                label="Current Semester"
-                type="number"
-                placeholder="e.g., 5"
-                value={semester}
-                onChange={(e) => setSemester(e.target.value)}
-                min="1"
-                max="10"
-              />
-              <Input
-                label="Skills"
-                placeholder="e.g., React, Python, UI Design"
-                value={skills}
-                onChange={(e) => setSkills(e.target.value)}
-                helperText="Separate with commas"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Navigation Buttons */}
-        <div className="flex items-center gap-3 mt-8">
-          {step > 1 && (
-            <Button variant="ghost" onClick={() => setStep(step - 1)} icon={<ArrowLeft className="w-4 h-4" />}>
-              Back
-            </Button>
-          )}
-          <Button
-            fullWidth
-            loading={loading}
-            onClick={step === totalSteps ? handleSubmit : handleNext}
-            iconRight={step < totalSteps ? <ArrowRight className="w-4 h-4" /> : undefined}
+        {/* Step 3: Student Details */}
+        {step === 3 && role === UserRole.STUDENT && (
+          <motion.div
+            key="step3"
+            initial={{ opacity: 0, x: 15 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -15 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-4"
           >
-            {step === totalSteps ? 'Create Account' : 'Continue'}
-          </Button>
-        </div>
+            <Input
+              label="College Name"
+              placeholder="e.g., IET DAVV"
+              value={college}
+              onChange={(e) => setCollege(e.target.value)}
+              icon={<BookOpen className="w-4 h-4" />}
+            />
+            <Input
+              label="Branch / Department"
+              placeholder="e.g., Computer Science"
+              value={branch}
+              onChange={(e) => setBranch(e.target.value)}
+            />
+            <Input
+              label="Current Semester"
+              type="number"
+              placeholder="e.g., 5"
+              value={semester}
+              onChange={(e) => setSemester(e.target.value)}
+              min="1"
+              max="10"
+            />
+            <Input
+              label="Skills"
+              placeholder="e.g., React, Python, UI Design"
+              value={skills}
+              onChange={(e) => setSkills(e.target.value)}
+              helperText="Separate with commas"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <p className="text-center text-sm text-fp-gray mt-6">
-          Already have an account?{' '}
-          <a href="/login" className="text-fp-neon-blue hover:text-fp-neon-blue/80 font-medium transition-colors">
-            Sign In
-          </a>
-        </p>
+      {/* Navigation Buttons */}
+      <div className="flex items-center gap-3 mt-7 pt-2">
+        {step > 1 && (
+          <Button variant="ghost" onClick={() => setStep(step - 1)} icon={<ArrowLeft className="w-4 h-4" />}>
+            Back
+          </Button>
+        )}
+        <Button
+          fullWidth
+          loading={loading}
+          size="lg"
+          className="h-12 text-base font-semibold"
+          onClick={step === totalSteps ? handleSubmit : handleNext}
+          iconRight={step < totalSteps ? <ArrowRight className="w-4 h-4" /> : undefined}
+        >
+          {step === totalSteps ? 'Create Account' : 'Continue'}
+        </Button>
       </div>
+
+      <p className="text-center text-xs sm:text-sm text-fp-gray mt-6">
+        Already have an account?{' '}
+        <a href="/login" className="text-fp-neon-blue hover:underline font-semibold transition-colors">
+          Sign In
+        </a>
+      </p>
     </motion.div>
   );
 }
