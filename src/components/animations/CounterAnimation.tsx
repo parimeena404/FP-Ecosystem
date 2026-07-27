@@ -32,11 +32,12 @@ export default function CounterAnimation({
   separator = true,
 }: CounterAnimationProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-100px' });
-  const [count, setCount] = useState(0);
+  const isInView = useInView(ref, { once: true, margin: '0px' });
+  const [count, setCount] = useState(end);
 
   useEffect(() => {
     if (!isInView) return;
+    setCount(0);
 
     let startTime: number;
     let animationFrame: number;
@@ -73,9 +74,8 @@ export default function CounterAnimation({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
       className="text-center"
     >
       <div className={cn('font-display font-bold tabular-nums', className)}>

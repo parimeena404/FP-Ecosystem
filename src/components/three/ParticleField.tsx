@@ -174,8 +174,8 @@ export default function ParticleField({
   return (
     <canvas
       ref={canvasRef}
-      className={cn('absolute inset-0 w-full h-full', className)}
-      style={{ pointerEvents: 'auto' }}
+      className={cn('absolute inset-0 w-full h-full pointer-events-none', className)}
+      style={{ pointerEvents: 'none' }}
     />
   );
 }

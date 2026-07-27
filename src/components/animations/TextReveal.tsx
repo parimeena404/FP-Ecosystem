@@ -1,6 +1,6 @@
 /* ──────────────────────────────────────────────────────────────
    FUTURE PILOT — Text Reveal Animation
-   Cinematic text entrance with per-word stagger
+   Clean, robust text entrance animation
    ────────────────────────────────────────────────────────────── */
 'use client';
 
@@ -27,8 +27,6 @@ export default function TextReveal({
   once = true,
   gradient = false,
 }: TextRevealProps) {
-  const words = text.split(' ');
-
   return (
     <Tag
       className={cn(
@@ -38,42 +36,13 @@ export default function TextReveal({
       )}
     >
       <motion.span
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once, margin: '-50px' }}
-        variants={{
-          hidden: {},
-          visible: {
-            transition: {
-              staggerChildren: stagger,
-              delayChildren: delay,
-            },
-          },
-        }}
-        className="inline"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once, margin: '-20px' }}
+        transition={{ duration: 0.6, delay, ease: [0.16, 1, 0.3, 1] }}
+        className="inline-block"
       >
-        {words.map((word, i) => (
-          <span key={i} className="inline-block overflow-hidden">
-            <motion.span
-              className="inline-block"
-              variants={{
-                hidden: { y: '110%', opacity: 0, rotateX: -80 },
-                visible: {
-                  y: '0%',
-                  opacity: 1,
-                  rotateX: 0,
-                  transition: {
-                    duration: 0.7,
-                    ease: [0.16, 1, 0.3, 1],
-                  },
-                },
-              }}
-            >
-              {word}
-            </motion.span>
-            {i < words.length - 1 && <span>&nbsp;</span>}
-          </span>
-        ))}
+        {text}
       </motion.span>
     </Tag>
   );
