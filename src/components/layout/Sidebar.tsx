@@ -1,6 +1,6 @@
 /* ──────────────────────────────────────────────────────────────
    FUTURE PILOT — Dashboard Sidebar
-   Collapsible, responsive navigation sidebar for Student Portal
+   Multi-role, collapsible, responsive navigation sidebar
    ────────────────────────────────────────────────────────────── */
 'use client';
 
@@ -22,25 +22,83 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Building,
+  GraduationCap,
+  Users,
+  UserCheck,
+  BarChart3,
+  PlusCircle,
+  CheckSquare,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useAuth } from '@/hooks/useAuth';
 import Avatar from '@/components/ui/Avatar';
 import { ProgressBar } from '@/components/ui/Table';
 import { logout } from '@/services/auth.service';
+import { UserRole } from '@/types';
 
-const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/student/dashboard', icon: LayoutDashboard },
-  { label: 'Projects', href: '/student/projects', icon: Briefcase },
-  { label: 'Applications', href: '/student/applications', icon: FileText },
-  { label: 'Portfolio', href: '/student/portfolio', icon: FolderOpen },
-  { label: 'Leaderboard', href: '/student/leaderboard', icon: Trophy },
-  { label: 'Wallet', href: '/student/wallet', icon: Wallet },
-  { label: 'Certificates', href: '/student/certificates', icon: Award },
-  { label: 'Achievements', href: '/student/achievements', icon: Star },
-  { label: 'Profile', href: '/student/profile', icon: UserIcon },
-  { label: 'Settings', href: '/student/settings', icon: Settings },
-];
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+}
+
+const ROLE_NAV_ITEMS: Record<string, NavItem[]> = {
+  student: [
+    { label: 'Dashboard', href: '/student/dashboard', icon: LayoutDashboard },
+    { label: 'Projects', href: '/student/projects', icon: Briefcase },
+    { label: 'Applications', href: '/student/applications', icon: FileText },
+    { label: 'Portfolio', href: '/student/portfolio', icon: FolderOpen },
+    { label: 'Leaderboard', href: '/student/leaderboard', icon: Trophy },
+    { label: 'Wallet', href: '/student/wallet', icon: Wallet },
+    { label: 'Certificates', href: '/student/certificates', icon: Award },
+    { label: 'Achievements', href: '/student/achievements', icon: Star },
+    { label: 'Profile', href: '/student/profile', icon: UserIcon },
+    { label: 'Settings', href: '/student/settings', icon: Settings },
+  ],
+  company: [
+    { label: 'Workspace', href: '/company/dashboard', icon: LayoutDashboard },
+    { label: 'Projects', href: '/company/projects', icon: Briefcase },
+    { label: 'Post Project', href: '/company/projects/new', icon: PlusCircle },
+    { label: 'Applicants', href: '/company/applicants', icon: Users },
+    { label: 'Company Profile', href: '/company/profile', icon: Building },
+  ],
+  college: [
+    { label: 'Dashboard', href: '/college/dashboard', icon: LayoutDashboard },
+    { label: 'Students', href: '/college/students', icon: GraduationCap },
+    { label: 'Corporate Partners', href: '/college/partners', icon: Building },
+    { label: 'Analytics', href: '/college/analytics', icon: BarChart3 },
+    { label: 'Profile', href: '/college/profile', icon: Building },
+  ],
+  mentor: [
+    { label: 'Workspace', href: '/mentor/dashboard', icon: LayoutDashboard },
+    { label: 'Projects', href: '/mentor/projects', icon: Briefcase },
+    { label: 'Reviews', href: '/mentor/reviews', icon: CheckSquare },
+    { label: 'Meetings', href: '/mentor/meetings', icon: Calendar },
+    { label: 'Profile', href: '/mentor/profile', icon: UserIcon },
+  ],
+  admin: [
+    { label: 'Command Center', href: '/admin/dashboard', icon: LayoutDashboard },
+    { label: 'Students', href: '/admin/students', icon: Users },
+    { label: 'Projects', href: '/admin/projects', icon: Briefcase },
+    { label: 'Applications', href: '/admin/applications', icon: FileText },
+    { label: 'Companies', href: '/admin/companies', icon: Building },
+    { label: 'Colleges', href: '/admin/colleges', icon: GraduationCap },
+    { label: 'Mentors', href: '/admin/mentors', icon: UserCheck },
+    { label: 'Finance', href: '/admin/finance', icon: Wallet },
+    { label: 'Analytics', href: '/admin/analytics', icon: BarChart3 },
+    { label: 'Settings', href: '/admin/settings', icon: Settings },
+  ],
+};
+
+const PORTAL_LABELS: Record<string, string> = {
+  student: 'Student Portal',
+  company: 'Company Portal',
+  college: 'University Portal',
+  mentor: 'Mentor Workspace',
+  admin: 'Admin Command',
+};
 
 export default function Sidebar({
   mobileOpen,
@@ -52,6 +110,23 @@ export default function Sidebar({
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { user, studentProfile } = useAuth();
+
+  // Determine active portal key based on pathname or user role
+  let portalKey = 'student';
+  if (pathname?.startsWith('/company')) portalKey = 'company';
+  else if (pathname?.startsWith('/college')) portalKey = 'college';
+  else if (pathname?.startsWith('/mentor')) portalKey = 'mentor';
+  else if (pathname?.startsWith('/admin')) portalKey = 'admin';
+  else if (pathname?.startsWith('/student')) portalKey = 'student';
+  else if (user?.role) {
+    if (user.role === UserRole.COMPANY) portalKey = 'company';
+    else if (user.role === UserRole.COLLEGE) portalKey = 'college';
+    else if (user.role === UserRole.MENTOR) portalKey = 'mentor';
+    else if (user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN) portalKey = 'admin';
+  }
+
+  const navItems = ROLE_NAV_ITEMS[portalKey] || ROLE_NAV_ITEMS.student;
+  const portalLabel = PORTAL_LABELS[portalKey] || 'Student Portal';
 
   const handleLogout = async () => {
     await logout();
@@ -76,8 +151,8 @@ export default function Sidebar({
               <span className="text-fp-white font-display font-bold text-base leading-tight">
                 Future Pilot
               </span>
-              <span className="text-fp-gray text-[9px] font-medium tracking-widest uppercase">
-                Student Portal
+              <span className="text-fp-neon-cyan text-[9px] font-medium tracking-widest uppercase">
+                {portalLabel}
               </span>
             </motion.div>
           )}
@@ -92,9 +167,9 @@ export default function Sidebar({
 
       {/* Navigation List */}
       <div className="flex-1 px-3 space-y-1 overflow-y-auto scrollbar-hide">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`);
+          const isActive = pathname === item.href || (item.href !== '/company/projects' && pathname?.startsWith(`${item.href}/`));
           return (
             <Link
               key={item.href}
@@ -119,8 +194,8 @@ export default function Sidebar({
         })}
       </div>
 
-      {/* XP & User Widget */}
-      {!collapsed && studentProfile && (
+      {/* XP Widget for Students */}
+      {!collapsed && portalKey === 'student' && studentProfile && (
         <div className="px-4 py-3 mx-3 my-3 bg-fp-surface/30 border border-fp-border/30 rounded-xl space-y-2">
           <div className="flex items-center justify-between text-xs font-semibold">
             <span className="text-fp-neon-cyan">{studentProfile.level || 'Explorer'}</span>
@@ -137,7 +212,7 @@ export default function Sidebar({
             <Avatar name={user?.displayName || 'User'} src={user?.photoURL} size="sm" />
             {!collapsed && (
               <div className="flex flex-col min-w-0">
-                <span className="text-xs font-medium text-fp-white truncate">{user?.displayName || 'Student Pilot'}</span>
+                <span className="text-xs font-medium text-fp-white truncate">{user?.displayName || 'Pilot User'}</span>
                 <span className="text-[10px] text-fp-gray truncate">{user?.email}</span>
               </div>
             )}

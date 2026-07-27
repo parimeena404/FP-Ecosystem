@@ -1,11 +1,10 @@
 /* ──────────────────────────────────────────────────────────────
    FUTURE PILOT — Advanced Escrow Service & State Machine
-   Full Escrow Lifecycle: created -> locked -> milestone_released -> completed
+   Full Escrow Lifecycle: created -> locked -> milestone_released -> completed / disputed / refunded
    ────────────────────────────────────────────────────────────── */
 
 import { COLLECTIONS } from '@/lib/firebase/config';
-import { getDocument, setDocument, updateDocument, createDocument } from '@/lib/firebase/firestore';
-import type { Milestone } from '@/types';
+import { getDocument, setDocument, updateDocument, createDocument, getDocuments } from '@/lib/firebase/firestore';
 
 export type EscrowStatus =
   | 'created'
@@ -25,6 +24,7 @@ export interface EscrowContract {
   commissionFeeAmount: number; // 15% platform fee
   studentPayoutAmount: number; // 85% net payout
   status: EscrowStatus;
+  disputeReason?: string;
   razorpayOrderId?: string;
   razorpayPaymentId?: string;
   createdAt: number;
@@ -88,4 +88,36 @@ export async function releaseMilestonePayout(
     status: nextStatus,
     updatedAt: Date.now(),
   });
+}
+
+export async function raiseEscrowDispute(escrowId: string, reason: string): Promise<void> {
+  return updateDocument(COLLECTIONS.TRANSACTIONS, escrowId, {
+    status: 'disputed',
+    disputeReason: reason,
+    updatedAt: Date.now(),
+  });
+}
+
+export async function resolveEscrowDispute(
+  escrowId: string,
+  resolutionStatus: 'completed' | 'refunded'
+): Promise<void> {
+  return updateDocument(COLLECTIONS.TRANSACTIONS, escrowId, {
+    status: resolutionStatus,
+    updatedAt: Date.now(),
+  });
+}
+
+export async function refundEscrowToCompany(escrowId: string): Promise<void> {
+  return updateDocument(COLLECTIONS.TRANSACTIONS, escrowId, {
+    status: 'refunded',
+    updatedAt: Date.now(),
+  });
+}
+
+export async function getEscrowByProject(projectId: string): Promise<EscrowContract | null> {
+  const results = await getDocuments<EscrowContract>(COLLECTIONS.TRANSACTIONS, {
+    filters: [{ field: 'projectId', operator: '==', value: projectId }],
+  });
+  return results.length > 0 ? results[0] : null;
 }

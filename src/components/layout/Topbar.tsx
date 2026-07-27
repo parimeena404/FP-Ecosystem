@@ -5,11 +5,30 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, Search, Bell, Sparkles, CheckCheck } from 'lucide-react';
 import { Dropdown } from '@/components/ui/Table';
 import Avatar from '@/components/ui/Avatar';
+import Badge from '@/components/ui/Badge';
 import { useAuth } from '@/hooks/useAuth';
-import { formatRelativeTime } from '@/lib/utils/format';
+import { UserRole } from '@/types';
+
+const ROLE_PROFILE_ROUTES: Record<string, string> = {
+  student: '/student/profile',
+  company: '/company/profile',
+  college: '/college/profile',
+  mentor: '/mentor/profile',
+  admin: '/admin/settings',
+};
+
+const ROLE_BADGE_LABELS: Record<string, string> = {
+  student: 'Student',
+  company: 'Company',
+  college: 'University',
+  mentor: 'Mentor',
+  admin: 'Admin',
+};
 
 export default function Topbar({
   onMenuClick,
@@ -17,7 +36,25 @@ export default function Topbar({
   onMenuClick: () => void;
 }) {
   const { user } = useAuth();
+  const pathname = usePathname();
   const [unreadCount, setUnreadCount] = useState(3);
+
+  // Determine current active portal key
+  let portalKey = 'student';
+  if (pathname?.startsWith('/company')) portalKey = 'company';
+  else if (pathname?.startsWith('/college')) portalKey = 'college';
+  else if (pathname?.startsWith('/mentor')) portalKey = 'mentor';
+  else if (pathname?.startsWith('/admin')) portalKey = 'admin';
+  else if (pathname?.startsWith('/student')) portalKey = 'student';
+  else if (user?.role) {
+    if (user.role === UserRole.COMPANY) portalKey = 'company';
+    else if (user.role === UserRole.COLLEGE) portalKey = 'college';
+    else if (user.role === UserRole.MENTOR) portalKey = 'mentor';
+    else if (user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN) portalKey = 'admin';
+  }
+
+  const profileHref = ROLE_PROFILE_ROUTES[portalKey] || '/student/profile';
+  const roleLabel = ROLE_BADGE_LABELS[portalKey] || 'Student';
 
   const mockNotifications = [
     { id: '1', title: 'Application Shortlisted', message: 'Your application for AI Chatbot Frontend was shortlisted!', time: new Date(Date.now() - 3600000) },
@@ -51,7 +88,7 @@ export default function Topbar({
         {/* Notification Bell */}
         <Dropdown
           trigger={
-            <div className="relative p-2 rounded-xl bg-fp-surface/30 border border-fp-border/30 hover:border-fp-border/60 text-fp-gray hover:text-fp-white transition-colors">
+            <div className="relative p-2 rounded-xl bg-fp-surface/30 border border-fp-border/30 hover:border-fp-border/60 text-fp-gray hover:text-fp-white transition-colors cursor-pointer">
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
                 <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-fp-neon-pink ring-2 ring-fp-dark animate-pulse" />
@@ -73,9 +110,12 @@ export default function Topbar({
         />
 
         {/* User Profile */}
-        <a href="/student/profile" className="flex items-center gap-2">
-          <Avatar name={user?.displayName || 'Student'} src={user?.photoURL} size="sm" />
-        </a>
+        <Link href={profileHref} className="flex items-center gap-2 hover:opacity-85 transition-opacity">
+          <Avatar name={user?.displayName || 'User'} src={user?.photoURL} size="sm" />
+          <Badge variant="info" className="hidden sm:inline-flex text-[10px] py-0.5 px-2">
+            {roleLabel}
+          </Badge>
+        </Link>
       </div>
     </header>
   );

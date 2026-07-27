@@ -1,14 +1,14 @@
 /* ──────────────────────────────────────────────────────────────
-   FUTURE PILOT — College Route Protection Layout
-   Enforces UserRole.COLLEGE or ADMIN access
+   FUTURE PILOT — Student Route Protection Layout
+   Enforces UserRole.STUDENT or ADMIN access
    ────────────────────────────────────────────────────────────── */
 
 import AuthGuard from '@/components/providers/AuthGuard';
 import { UserRole } from '@/types';
 
-export default function CollegeLayout({ children }: { children: React.ReactNode }) {
+export default function StudentLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AuthGuard allowedRoles={[UserRole.COLLEGE, UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+    <AuthGuard allowedRoles={[UserRole.STUDENT, UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
       {children}
     </AuthGuard>
   );

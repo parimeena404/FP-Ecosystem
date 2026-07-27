@@ -1,18 +1,20 @@
 /* ──────────────────────────────────────────────────────────────
    FUTURE PILOT — Login Page
-   Email/password + Google sign-in with premium UI
+   Email/password + Google sign-in + Instant Multi-Role Demo Mode
    ────────────────────────────────────────────────────────────── */
 'use client';
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Sparkles, User, Building, GraduationCap, UserCheck, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { loginWithEmail, loginWithGoogleProvider } from '@/services/auth.service';
 import { validateEmail, validatePassword } from '@/lib/utils/validators';
 import { ROLE_DASHBOARD_ROUTES } from '@/config/rbac';
+import { UserRole } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 import { fadeInUp, staggerContainer } from '@/lib/animations/variants';
 
 export default function LoginPage() {
@@ -21,6 +23,7 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const { setDemoRole } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,20 +82,26 @@ export default function LoginPage() {
     }
   };
 
+  const handleDemoAccess = (role: UserRole, targetRoute: string) => {
+    setDemoRole(role);
+    toast.success(`Entering ${role.toUpperCase()} workspace`);
+    window.location.href = targetRoute;
+  };
+
   return (
     <motion.div
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
-      className="w-full"
+      className="w-full max-w-lg mx-auto"
     >
       <motion.div
         variants={fadeInUp}
-        className="bg-fp-dark/60 backdrop-blur-xl border border-fp-border/30 rounded-2xl p-8"
+        className="bg-fp-dark/60 backdrop-blur-xl border border-fp-border/30 rounded-2xl p-6 sm:p-8"
       >
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-fp-white font-display mb-2">Welcome Back</h1>
-          <p className="text-fp-gray text-sm">Sign in to your Future Pilot account</p>
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold text-fp-white font-display mb-1">Welcome Back</h1>
+          <p className="text-fp-gray text-sm">Sign in to your Future Pilot workspace</p>
         </div>
 
         {/* Google Sign-In */}
@@ -101,7 +110,7 @@ export default function LoginPage() {
           fullWidth
           loading={googleLoading}
           onClick={handleGoogleLogin}
-          className="mb-6"
+          className="mb-5"
           icon={
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -115,7 +124,7 @@ export default function LoginPage() {
         </Button>
 
         {/* Divider */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-5">
           <div className="flex-1 h-px bg-fp-border/30" />
           <span className="text-xs text-fp-gray uppercase tracking-wider">or</span>
           <div className="flex-1 h-px bg-fp-border/30" />
@@ -165,6 +174,45 @@ export default function LoginPage() {
             Sign In
           </Button>
         </form>
+
+        {/* Quick Demo Access Bar */}
+        <div className="mt-8 pt-6 border-t border-fp-border/30 space-y-3">
+          <div className="flex items-center gap-2 text-xs font-semibold text-fp-neon-cyan">
+            <Sparkles className="w-4 h-4" /> Quick Demo Role Access (1-Click Portal Preview)
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+            <button
+              onClick={() => handleDemoAccess(UserRole.STUDENT, '/student/dashboard')}
+              className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-fp-surface/40 hover:bg-fp-neon-blue/15 border border-fp-border/30 hover:border-fp-neon-blue/40 text-fp-white transition-all cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5 text-fp-neon-blue" /> Student
+            </button>
+            <button
+              onClick={() => handleDemoAccess(UserRole.COMPANY, '/company/dashboard')}
+              className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-fp-surface/40 hover:bg-fp-neon-purple/15 border border-fp-border/30 hover:border-fp-neon-purple/40 text-fp-white transition-all cursor-pointer"
+            >
+              <Building className="w-3.5 h-3.5 text-fp-neon-purple" /> Company
+            </button>
+            <button
+              onClick={() => handleDemoAccess(UserRole.COLLEGE, '/college/dashboard')}
+              className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-fp-surface/40 hover:bg-fp-neon-cyan/15 border border-fp-border/30 hover:border-fp-neon-cyan/40 text-fp-white transition-all cursor-pointer"
+            >
+              <GraduationCap className="w-3.5 h-3.5 text-fp-neon-cyan" /> University
+            </button>
+            <button
+              onClick={() => handleDemoAccess(UserRole.MENTOR, '/mentor/dashboard')}
+              className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-fp-surface/40 hover:bg-fp-neon-gold/15 border border-fp-border/30 hover:border-fp-neon-gold/40 text-fp-white transition-all cursor-pointer"
+            >
+              <UserCheck className="w-3.5 h-3.5 text-fp-neon-gold" /> Mentor
+            </button>
+            <button
+              onClick={() => handleDemoAccess(UserRole.ADMIN, '/admin/dashboard')}
+              className="flex items-center justify-center gap-1.5 p-2 rounded-xl bg-fp-surface/40 hover:bg-fp-neon-pink/15 border border-fp-border/30 hover:border-fp-neon-pink/40 text-fp-white transition-all col-span-2 sm:col-span-2 cursor-pointer"
+            >
+              <Shield className="w-3.5 h-3.5 text-fp-neon-pink" /> Admin Command Center
+            </button>
+          </div>
+        </div>
 
         <p className="text-center text-sm text-fp-gray mt-6">
           Don&apos;t have an account?{' '}

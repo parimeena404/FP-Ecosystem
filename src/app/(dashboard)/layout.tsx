@@ -13,7 +13,16 @@ export default function DashboardRouteGroupLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthGuard allowedRoles={[UserRole.STUDENT, UserRole.ADMIN, UserRole.SUPER_ADMIN]}>
+    <AuthGuard
+      allowedRoles={[
+        UserRole.STUDENT,
+        UserRole.COLLEGE,
+        UserRole.COMPANY,
+        UserRole.MENTOR,
+        UserRole.ADMIN,
+        UserRole.SUPER_ADMIN,
+      ]}
+    >
       <DashboardLayout>{children}</DashboardLayout>
     </AuthGuard>
   );
