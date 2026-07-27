@@ -81,15 +81,15 @@ Future Pilot features 5 dedicated role-tailored portals protected by Role-Based 
 Future Pilot enforces a zero-risk financial state machine for both companies and students:
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Created: Project Created & Assigned
-    Created --> Locked: Company Funds Razorpay Escrow
-    Locked --> Milestone1_Released: Milestone 1 Approved (30% Payout)
-    Milestone1_Released --> Milestone2_Released: Milestone 2 Approved (30% Payout)
-    Milestone2_Released --> Completed: Final Milestone Approved (40% Payout)
-    Locked --> Disputed: Quality/Deadline Conflict
-    Disputed --> Completed: Admin Resolves for Student
-    Disputed --> Refunded: Admin Resolves for Company
+graph TD
+    A["Project Created & Assigned"] --> B["Company Funds Razorpay Escrow"]
+    B --> C["Milestone 1 Approved (30% Payout)"]
+    C --> D["Milestone 2 Approved (30% Payout)"]
+    D --> E["Final Milestone Approved (40% Payout)"]
+    E --> F["Escrow Completed"]
+    B --> G["Dispute Raised"]
+    G --> F
+    G --> H["Escrow Refunded to Company"]
 ```
 
 ---
